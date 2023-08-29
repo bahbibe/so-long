@@ -35,10 +35,11 @@
    cd 42_so_long
 2. Build the project:
     ```sh
-   make
+    make
 3. Run the game
    ```sh
    ./so_long maps/map.ber
+
 ## Usage
 Upon running the game, you will be presented with the 2D game environment. Interact with the game using the keyboard and mouse to experience the basic gameplay elements you've implemented.
 
