@@ -52,18 +52,25 @@ int	flood_fill(t_game *game, char **map)
 	return (0);
 }
 
+static int	path_error(t_game *game, char **map, char *msg)
+{
+	to_free(map);
+	return (set_error(game, msg));
+}
+
 int	check_path(t_game *game)
 {
-	game->map2 = dup_map(game);
-	if (!game->map2)
+	char	**map;
+
+	map = dup_map(game);
+	if (!map)
 		return (set_error(game, "Out of memory"));
-	if (flood_fill(game, game->map2))
-		return (set_error(game, "Out of memory"));
-	if (check_collect(game, 'C'))
-		return (set_error(game, "Player Can't reach all collectibles"));
-	if (check_collect(game, 'E'))
-		return (set_error(game, "Player Can not exit"));
-	to_free(game->map2);
-	game->map2 = NULL;
+	if (flood_fill(game, map))
+		return (path_error(game, map, "Out of memory"));
+	if (check_collect(map, 'C'))
+		return (path_error(game, map, "Player Can't reach all collectibles"));
+	if (check_collect(map, 'E'))
+		return (path_error(game, map, "Player Can not exit"));
+	to_free(map);
 	return (0);
 }

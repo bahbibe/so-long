@@ -85,13 +85,15 @@ expect_error "Can not exit" "$tmp/big.ber"
 expect_valid "$dir/ok_nonl.ber"
 expect_valid "$dir/ok_trailing_nl.ber"
 expect_valid maps/map1.ber
-# textures are loaded relative to the current directory
+# no assets are loaded from disk: the game starts from any directory
 cp "$dir/ok_nonl.ber" "$tmp/a.ber"
-out=$(cd "$tmp" && "$BIN" a.ber 2>&1 >/dev/null)
-if printf '%s' "$out" | grep -q "Can not load textures"; then
+(cd "$tmp" && "$BIN" a.ber >/dev/null 2>"$tmp/err") &
+pid=$!
+sleep 1
+if kill "$pid" 2>/dev/null; then
 	echo "ok   run outside repo root"
 else
-	echo "FAIL run outside repo root (got: $out)"
+	echo "FAIL run outside repo root (got: $(cat "$tmp/err"))"
 	fails=$((fails + 1))
 fi
 

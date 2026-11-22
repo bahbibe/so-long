@@ -87,7 +87,12 @@ int	move_ghosts(t_game *game)
 	if (game->ghost_count == 0 || !game->ghosts || !game->dist
 		|| !game->queue)
 		return (0);
-	ghost_dist(game);
+	if (game->dist_x != game->pos_x || game->dist_y != game->pos_y)
+	{
+		ghost_dist(game);
+		game->dist_x = game->pos_x;
+		game->dist_y = game->pos_y;
+	}
 	i = -1;
 	while (++i < game->ghost_count)
 		if (step_ghost(game, &game->ghosts[i]))

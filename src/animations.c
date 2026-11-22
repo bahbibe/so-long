@@ -35,70 +35,51 @@ void	move(t_game *game, char next, int x, int y)
 	}
 }
 
-void	move_player(t_game *game, t_image *img, int x, int y)
+void	move_player(t_game *game, int x, int y)
 {
 	char	next;
+	long	now;
 
 	next = game->map[game->pos_x + x][game->pos_y + y];
 	if (game->end || next == '1' || (next == 'E' && game->colct != 0))
 		return ;
+	now = now_ms();
 	game->moves++;
+	game->from = player_px(game, now);
+	game->move_t0 = now;
 	move(game, next, x, y);
-	if (game->end == 0)
-	{
-		mlx_clear_window(game->mlx, game->mlx_win);
-		render_assets(img);
-	}
-	else
-		show_end(img);
+	game->dirty = 1;
 }
 
-int	move_keys(int key, t_image *img)
+int	key_press(int key, t_game *game)
 {
 	if (key == K_ESC || key == K_Q)
-		quit(img->game);
+		quit(game);
 	else if (key == K_W || key == A_W)
-	{
-		img->play = img->play_u;
-		move_player(img->game, img, -1, 0);
-	}
+		game->dir = 0;
 	else if (key == K_S || key == A_S)
-	{
-		img->play = img->play_d;
-		move_player(img->game, img, 1, 0);
-	}
+		game->dir = 1;
 	else if (key == K_A || key == A_A)
-	{
-		img->play = img->play_l;
-		move_player(img->game, img, 0, -1);
-	}
+		game->dir = 2;
 	else if (key == K_D || key == A_D)
-	{
-		img->play = img->play_r;
-		move_player(img->game, img, 0, 1);
-	}
+		game->dir = 3;
+	else
+		return (0);
+	if (game->dir == 0)
+		move_player(game, -1, 0);
+	else if (game->dir == 1)
+		move_player(game, 1, 0);
+	else if (game->dir == 2)
+		move_player(game, 0, -1);
+	else
+		move_player(game, 0, 1);
 	return (0);
 }
 
 int	quit(t_game *game)
 {
-	mlx_destroy_window(game->mlx, game->mlx_win);
+	destroy_gfx(game);
 	to_free(game->map);
 	free_ghosts(game);
 	exit(0);
-}
-
-void	show_end(t_image *img)
-{
-	t_game	*game;
-
-	game = img->game;
-	mlx_clear_window(game->mlx, game->mlx_win);
-	if (game->end == 2)
-		mlx_put_image_to_window(game->mlx, game->mlx_win, img->ko,
-			(game->len * SCALE - 600) / 2, (game->lines * SCALE - 400) / 2);
-	else
-		mlx_put_image_to_window(game->mlx, game->mlx_win, img->ok,
-			(game->len * SCALE - 700) / 2, (game->lines * SCALE - 400) / 2);
-	put_banner(game, "PRESS ESC OR Q TO EXIT ...");
 }

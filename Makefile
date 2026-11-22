@@ -24,7 +24,7 @@ White	=\033[0;37m
 
 CC		=	cc
 NAME	=	so_long
-FLAGS	=	-Wall -Wextra -Werror
+FLAGS		=	-Wall -Wextra -Werror -O2
 
 SRCS	=	src/error_checkers.c \
 			src/animations.c \
@@ -35,7 +35,14 @@ SRCS	=	src/error_checkers.c \
 			src/init.c\
 			src/map_checkers.c \
 			src/path_checker.c \
-			src/textures.c \
+			src/draw_shapes.c \
+			src/draw_tiles.c \
+			src/draw_actors.c \
+			src/draw_hud.c \
+			src/frame.c \
+			src/render.c \
+			src/scene.c \
+			src/clock.c \
 			main.c
 
 LIBS		=	libft gnl
@@ -62,6 +69,17 @@ UNIT_SRCS	=	tests/test_ghosts.c \
 			src/path_checker.c \
 			src/helpers.c
 
+RENDER_SRCS	=	tests/test_render.c \
+			src/draw_shapes.c \
+			src/draw_tiles.c \
+			src/draw_actors.c \
+			src/draw_hud.c \
+			src/frame.c \
+			src/render.c \
+			src/scene.c \
+			src/clock.c \
+			src/helpers.c
+
 all: $(LIBS) $(NAME)
 	@:
 $(NAME): $(SRCS) includes/so_long.h $(MLX_LIB)
@@ -82,11 +100,13 @@ fclean: clean
 	@rm -rf $(NAME)
 	@rm -rf $(INCLUDES)
 	@if [ -n "$(MLX_DIR)" ]; then make -C $(MLX_DIR) clean > /dev/null; fi
-	@rm -f tests/test_ghosts
+	@rm -f tests/test_ghosts tests/test_render
 re: fclean all
 
-unit: $(LIBS)
+unit: $(LIBS) $(MLX_LIB)
 	@$(CC) -I includes $(MLX_INC) $(FLAGS) $(UNIT_SRCS) $(INCLUDES) -o tests/test_ghosts
 	@tests/test_ghosts
+	@$(CC) -I includes $(MLX_INC) $(FLAGS) $(RENDER_SRCS) $(INCLUDES) $(MLX) -o tests/test_render
+	@tests/test_render
 
 .PHONY: all libs $(LIBS) clean fclean re unit
