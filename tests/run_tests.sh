@@ -66,6 +66,22 @@ expect_error "Duplicate or missing token" "$dir/bad_newline_only.ber"
 expect_error "reach all collectibles" "$dir/bad_unreach_c.ber"
 expect_error "reach all collectibles" "$dir/bad_ghost_blocks.ber"
 expect_error "Can not exit" "$dir/bad_unreach_e.ber"
+# big open map: the old recursive flood fill overflowed the stack here
+awk 'BEGIN { n = 600
+	for (i = 0; i < n; i++) {
+		row = ""
+		for (j = 0; j < n; j++) {
+			c = "0"
+			if (i == 0 || j == 0 || i == n - 1 || j == n - 1) c = "1"
+			if (i == 1 && j == 1) c = "P"
+			if (i == 1 && j == 2) c = "C"
+			if (i == n - 2 && j == n - 2) c = "E"
+			if ((i == n - 3 && j == n - 2) || (i == n - 2 && j == n - 3)) c = "1"
+			row = row c
+		}
+		print row
+	} }' > "$tmp/big.ber"
+expect_error "Can not exit" "$tmp/big.ber"
 expect_valid "$dir/ok_nonl.ber"
 expect_valid "$dir/ok_trailing_nl.ber"
 expect_valid maps/map1.ber

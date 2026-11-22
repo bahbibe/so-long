@@ -52,6 +52,12 @@ typedef struct s_ghost
 	int	y;
 }	t_ghost;
 
+typedef struct s_cell
+{
+	int	x;
+	int	y;
+}	t_cell;
+
 typedef struct s_game
 {
 	int		frame;
@@ -119,8 +125,7 @@ int		is_rect(t_game *game);
 int		check_token_type( t_game *game);
 int		check_token_count(t_game *game);
 int		is_closed(t_game *game);
-void	flood_fill_one(int pos_x, int pos_y, char **map);
-void	flood_fill_two(int pos_x, int pos_y, char **map);
+int		flood_fill(t_game *game, char **map);
 int		check_collect(t_game *game, char c);
 int		check(t_game *game, char *filename);
 int		check_path(t_game *game);

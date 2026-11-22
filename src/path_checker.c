@@ -12,30 +12,44 @@
 
 #include "so_long.h"
 
-void	flood_fill_one(int pos_x, int pos_y, char **map)
+static void	push_next(char **map, t_cell *queue, int *tail, t_cell c)
 {
-	if ((map[pos_x][pos_y] != '0' && map[pos_x][pos_y] != 'C'
-	&& map[pos_x][pos_y] != 'P'))
+	if (map[c.x][c.y] == '1' || map[c.x][c.y] == 'X'
+	|| map[c.x][c.y] == 'Y')
 		return ;
-	map[pos_x][pos_y] = 'X';
-	flood_fill_one(pos_x + 1, pos_y, map);
-	flood_fill_one(pos_x, pos_y + 1, map);
-	flood_fill_one(pos_x, pos_y - 1, map);
-	flood_fill_one(pos_x - 1, pos_y, map);
-	return ;
+	if (map[c.x][c.y] == 'E')
+	{
+		map[c.x][c.y] = 'Y';
+		return ;
+	}
+	map[c.x][c.y] = 'X';
+	queue[(*tail)++] = c;
 }
 
-void	flood_fill_two(int pos_x, int pos_y, char **map)
+int	flood_fill(t_game *game, char **map)
 {
-	if ((map[pos_x][pos_y] != '0' && map[pos_x][pos_y] != 'E'
-	&& map[pos_x][pos_y] != 'X'))
-		return ;
-	map[pos_x][pos_y] = 'Y';
-	flood_fill_two(pos_x + 1, pos_y, map);
-	flood_fill_two(pos_x, pos_y + 1, map);
-	flood_fill_two(pos_x, pos_y - 1, map);
-	flood_fill_two(pos_x - 1, pos_y, map);
-	return ;
+	t_cell	*queue;
+	t_cell	c;
+	int		head;
+	int		tail;
+
+	queue = malloc(sizeof(t_cell) * game->lines * game->len);
+	if (!queue)
+		return (1);
+	head = 0;
+	tail = 0;
+	map[game->pos_x][game->pos_y] = 'X';
+	queue[tail++] = (t_cell){game->pos_x, game->pos_y};
+	while (head < tail)
+	{
+		c = queue[head++];
+		push_next(map, queue, &tail, (t_cell){c.x + 1, c.y});
+		push_next(map, queue, &tail, (t_cell){c.x - 1, c.y});
+		push_next(map, queue, &tail, (t_cell){c.x, c.y + 1});
+		push_next(map, queue, &tail, (t_cell){c.x, c.y - 1});
+	}
+	free(queue);
+	return (0);
 }
 
 int	check_path(t_game *game)
@@ -43,10 +57,10 @@ int	check_path(t_game *game)
 	game->map2 = dup_map(game);
 	if (!game->map2)
 		return (set_error(game, "Out of memory"));
-	flood_fill_one(game->pos_x, game->pos_y, game->map2);
+	if (flood_fill(game, game->map2))
+		return (set_error(game, "Out of memory"));
 	if (check_collect(game, 'C'))
 		return (set_error(game, "Player Can't reach all collectibles"));
-	flood_fill_two(game->pos_x, game->pos_y, game->map2);
 	if (check_collect(game, 'E'))
 		return (set_error(game, "Player Can not exit"));
 	to_free(game->map2);
