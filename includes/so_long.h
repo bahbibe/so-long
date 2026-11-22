@@ -51,6 +51,7 @@
 #  define GHOST_DELAY 450
 # endif
 # define GHOST_GLIDE 180
+# define ANIM_MS 140
 
 # define C_FLOOR 0x1B1E2B
 # define C_MORTAR 0x0E0F16
@@ -118,6 +119,7 @@ typedef struct s_game
 	int		dirty;
 	int		ghost_count;
 	long	last_frame;
+	long	phase;
 	long	move_t0;
 	long	ghost_t0;
 	t_pt	from;

@@ -24,7 +24,7 @@ void	draw_items(t_game *game, long now)
 		while (++j < game->len)
 		{
 			if (game->map[i][j] == 'C')
-				draw_coin(&game->fb, tile_origin(i, j), (i + j + now / 140));
+				draw_coin(&game->fb, tile_origin(i, j), (i + j + now / ANIM_MS));
 			else if (game->map[i][j] == 'E')
 				draw_door(&game->fb, tile_origin(i, j), game->colct == 0);
 		}
@@ -54,7 +54,7 @@ void	draw_ghosts(t_game *game, long now)
 		at.x = lerp(at.x, to.x, now - game->ghost_t0, GHOST_GLIDE);
 		at.y = lerp(at.y, to.y, now - game->ghost_t0, GHOST_GLIDE);
 		draw_ghost(&game->fb, at, (t_pt){sign(me.x - at.x), sign(me.y - at.y)},
-			now / 140 + i);
+			now / ANIM_MS + i);
 	}
 }
 
