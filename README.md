@@ -41,7 +41,7 @@ Maps are plain text files. Write your own with the [map format](docs/map-format.
 ## Notable bits
 
 - **No assets.** Walls, coins, ghosts, the player and the digits in the top bar are drawn with a few pixel primitives into one framebuffer. The old version used 15 XPM files and one `put_image` per tile. The new one copies a pre-drawn background and calls `put_image` once per frame, so it does not flicker.
-- **The drawing code needs no display.** It works on a plain buffer, so `make unit` tests it on a `calloc`ed one with guard bytes around it. 43 checks cover clipping, NULL buffers and out of bounds writes.
+- **The drawing code needs no display.** It works on a plain buffer, so `make unit` tests it on a `calloc`ed one with guard bytes around it. The 43 checks in `make unit` cover the ghost logic, and the drawing code's clipping, NULL buffers and out of bounds writes.
 - **Ghost AI is one BFS.** A distance field from the player is computed once per player move. Each ghost steps to a neighbour that is one closer.
 - **The map check does not recurse.** The first flood fill overflowed the stack on a 600 x 600 open map (360,000 cells). It is now a BFS on a heap queue, and a test generates that map.
 - **It idles quietly.** The loop draws only when something moves or animates. On a map with one idle ghost that is about 3% of one core, down from 8%.
