@@ -128,6 +128,6 @@ tests/               test script and test maps
 
 ## License
 
-See [LICENSE](LICENSE) if present. This project was written as part of the 42 school curriculum.
+MIT. See [LICENSE](LICENSE). This project was written as part of the 42 school curriculum.
 
 Created by Boubker Ahbibe.
