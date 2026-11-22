@@ -14,8 +14,8 @@
 
 static void	push_next(char **map, t_cell *queue, int *tail, t_cell c)
 {
-	if (map[c.x][c.y] == '1' || map[c.x][c.y] == 'X'
-	|| map[c.x][c.y] == 'Y')
+	if (map[c.x][c.y] != '0' && map[c.x][c.y] != 'C'
+	&& map[c.x][c.y] != 'P' && map[c.x][c.y] != 'E')
 		return ;
 	if (map[c.x][c.y] == 'E')
 	{
