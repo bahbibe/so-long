@@ -1,11 +1,12 @@
 # so_long
 
-A small 2D game written in C with MiniLibX, built for the 42 school curriculum. You move a player around a map, collect every collectible, avoid the ghosts and reach the exit.
+A small 2D game written in C with MiniLibX, built for the 42 school curriculum. You move a player around a map, collect every collectible, run from the ghosts that chase you and reach the exit.
 
 ## Requirements
 
-- macOS with MiniLibX installed (`-lmlx -framework OpenGL -framework AppKit`). The Makefile and the key codes in `includes/so_long.h` are macOS only.
 - A C compiler (`cc`) and `make`.
+- macOS with MiniLibX installed (`-lmlx -framework OpenGL -framework AppKit`), or
+- Linux with the X11 development files (`libx11-dev`, `libxext-dev`). MiniLibX for Linux is bundled in `minilibx-linux/` (a copy of [42Paris/minilibx-linux](https://github.com/42Paris/minilibx-linux) at commit `7dc53a4`) and `make` builds it.
 
 ## Build
 
@@ -15,7 +16,7 @@ cd so-long
 make
 ```
 
-`make` builds the bundled `libft` and `gnl` libraries, then the `so_long` binary. Other targets: `make clean`, `make fclean`, `make re`.
+`make` builds the bundled `libft` and `gnl` libraries (and MiniLibX on Linux), then the `so_long` binary. Other targets: `make clean`, `make fclean`, `make re`, `make unit` (see Tests).
 
 ## Run
 
@@ -40,7 +41,7 @@ Run the game from the repository root. Textures are loaded from `./img`, so anot
 
 - Collect every collectible (`C`). The door at the exit (`E`) opens once all of them are taken. Walking into it before that does nothing.
 - Reach the opened exit to win.
-- Touching a ghost (`G`) ends the game with a loss.
+- Ghosts (`G`) hunt you. They take one step toward you at a fixed pace, along the shortest path around walls. Touching a ghost ends the game with a loss, whether you walk into it or it reaches you. Ghosts pass over collectibles and the exit, and two ghosts never share a tile. A ghost that is walled off from you stays where it is.
 - Walls (`1`) block movement.
 - The top row of the window shows `NUMBER OF MOVES : <n>`. Only moves that actually change the player's position are counted. Bumping into a wall or a closed door is not a move.
 - After a win or a loss the game stops accepting moves. Press `ESC` or `Q` to exit.
@@ -56,7 +57,7 @@ A map is a text file with the `.ber` extension (a name that is only `.ber` is re
 | `P` | Player start (exactly one) |
 | `E` | Exit (exactly one) |
 | `C` | Collectible (at least one) |
-| `G` | Ghost (optional, any number) |
+| `G` | Ghost start tile (optional, any number) |
 
 Rules checked at start-up:
 
@@ -64,7 +65,7 @@ Rules checked at start-up:
 - The map is surrounded by walls.
 - Only the characters above appear.
 - There is one `P`, one `E` and at least one `C`.
-- Every `C` can be reached from `P`, and `E` can be reached once the collectibles are taken. Ghosts block the path, so a collectible that can only be reached through a ghost counts as unreachable.
+- Every `C` can be reached from `P`, and `E` can be reached once the collectibles are taken. The check uses the ghosts' start tiles as walls, so a collectible that can only be reached through a ghost's start tile counts as unreachable.
 
 Example (`maps/map1.ber` is a bigger one):
 
@@ -97,9 +98,17 @@ On an invalid map or a start-up failure the program prints `Error:` and a messag
 | `Can not create window` | `mlx_new_window` failed |
 | `Out of memory` | An allocation failed |
 
+## Ghost speed
+
+Ghosts step every `GHOST_DELAY` iterations of the MiniLibX loop (`includes/so_long.h`, default 30000). The project may only use the allowed functions, so there is no clock and the pace depends on how fast the loop runs. 30000 is about half a second per step on Linux. Change it for your machine at build time:
+
+```sh
+make re FLAGS="-Wall -Wextra -Werror -DGHOST_DELAY=60000"
+```
+
 ## Tests
 
-`tests/run_tests.sh` runs the binary against the maps in `tests/maps` and checks the exit status and the error message for each case. Valid maps are started and killed after one second. A display is needed because `mlx_init` runs before the window opens.
+`tests/run_tests.sh` runs the binary against the maps in `tests/maps` and checks the exit status and the error message for each case. Valid maps are started and killed after one second. A display is needed because `mlx_init` runs before the window opens (`xvfb-run tests/run_tests.sh` works on a headless Linux box).
 
 ```sh
 make
@@ -107,6 +116,8 @@ tests/run_tests.sh
 ```
 
 Set `BIN=/path/to/so_long` to test another binary.
+
+`make unit` builds and runs `tests/test_ghosts.c`, which tests the ghost logic without a window: setup, shortest path chase, no stacking, walled off ghosts and the no-ghost case.
 
 ## Project layout
 
@@ -118,16 +129,20 @@ src/path_checker.c   flood fill and reachability check
 src/helpers.c        map reading and copying, cleanup
 src/init.c           game state, texture loading, window setup
 src/textures.c       rendering and the move counter
-src/animations.c     movement, key handling, ghost animation
+src/animations.c     movement, key handling, end screen
+src/ghosts.c         ghost setup, cleanup and lookup
+src/ghost_move.c     breadth first search and ghost steps
+src/ghost_anim.c     ghost drawing and the per-loop timer
 includes/libft       libft
 includes/gnl         get_next_line
 img/                 XPM textures
+minilibx-linux/      MiniLibX for Linux (built by make on Linux)
 maps/                sample map
-tests/               test script and test maps
+tests/               test script, test maps and ghost unit tests
 ```
 
 ## License
 
-MIT. See [LICENSE](LICENSE). This project was written as part of the 42 school curriculum.
+MIT. See [LICENSE](LICENSE). This project was written as part of the 42 school curriculum. `minilibx-linux/` is third party code and keeps its own license (see `minilibx-linux/LICENSE`).
 
 Created by Boubker Ahbibe.
