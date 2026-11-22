@@ -30,6 +30,13 @@ static void	ghost_step(t_game *game, long now)
 	game->dirty = 1;
 }
 
+/* Something is in motion: the player slides, the ghosts glide. */
+static int	moving(t_game *game, long now)
+{
+	return (now - game->move_t0 < MOVE_MS
+		|| (game->ghost_count && now - game->ghost_t0 < GHOST_GLIDE));
+}
+
 int	tick(t_game *game)
 {
 	long	now;
@@ -37,15 +44,18 @@ int	tick(t_game *game)
 	now = now_ms();
 	if (now - game->last_frame < FRAME_MS)
 	{
-		usleep(1000);
+		usleep(5000);
 		return (0);
 	}
 	game->last_frame = now;
 	if (!game->end && game->ghost_count && now - game->ghost_t0 >= GHOST_DELAY)
 		ghost_step(game, now);
-	if (game->dirty || (!game->end && (game->ghost_count
-				|| now - game->move_t0 < MOVE_MS)))
+	if (game->dirty || (!game->end && (moving(game, now)
+				|| now / ANIM_MS != game->phase)))
+	{
+		game->phase = now / ANIM_MS;
 		render(game);
+	}
 	return (0);
 }
 
