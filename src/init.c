@@ -22,6 +22,11 @@ void	init_game(t_game *game)
 	game->colct = 0;
 	game->exit = 0;
 	game->end = 0;
+	game->steps = 0;
+	game->ghost_count = 0;
+	game->ghosts = NULL;
+	game->dist = NULL;
+	game->queue = NULL;
 	game->map = NULL;
 	game->map2 = NULL;
 	game->error = NULL;

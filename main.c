@@ -23,7 +23,8 @@ int	main(int ac, char **av)
 		exit(1);
 	}
 	init_game(&game);
-	if (check(&game, av[1]) || init_window(&game, &img))
+	if (check(&game, av[1]) || init_ghosts(&game)
+		|| init_window(&game, &img))
 		exit_error(&game);
 	render_assets(&img);
 	mlx_key_hook(game.mlx_win, move_keys, &img);

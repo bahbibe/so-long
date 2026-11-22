@@ -47,6 +47,7 @@ void	exit_error(t_game *game)
 	ft_putstr_fd("\n", 2);
 	to_free(game->map);
 	to_free(game->map2);
+	free_ghosts(game);
 	exit (1);
 }
 

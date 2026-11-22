@@ -14,7 +14,9 @@
 
 void	move(t_game *game, char next, int x, int y)
 {
-	if (next == 'G' || (next == 'E' && game->colct == 0))
+	if (ghost_at(game, game->pos_x + x, game->pos_y + y))
+		game->end = 2;
+	else if (next == 'E' && game->colct == 0)
 		game->end = 1;
 	else if (next == 'C')
 	{
@@ -41,18 +43,14 @@ void	move_player(t_game *game, t_image *img, int x, int y)
 	if (game->end || next == '1' || (next == 'E' && game->colct != 0))
 		return ;
 	game->moves++;
-	mlx_clear_window(game->mlx, game->mlx_win);
 	move(game, next, x, y);
 	if (game->end == 0)
+	{
+		mlx_clear_window(game->mlx, game->mlx_win);
 		render_assets(img);
-	else if (next == 'G')
-		mlx_put_image_to_window(game->mlx, game->mlx_win, img->ko,
-			(game->len * SCALE - 600) / 2, (game->lines * SCALE - 400) / 2);
+	}
 	else
-		mlx_put_image_to_window(game->mlx, game->mlx_win, img->ok,
-			(game->len * SCALE - 700) / 2, (game->lines * SCALE - 400) / 2);
-	if (game->end)
-		put_banner(game, "PRESS ESC OR Q TO EXIT ...");
+		show_end(img);
 }
 
 int	move_keys(int key, t_image *img)
@@ -86,33 +84,21 @@ int	quit(t_game *game)
 {
 	mlx_destroy_window(game->mlx, game->mlx_win);
 	to_free(game->map);
+	free_ghosts(game);
 	exit(0);
 }
 
-int	animate(t_image *img)
+void	show_end(t_image *img)
 {
-	if (img->game->frame == 3000 && img->game->end == 0)
-	{
-		img->ghost = img->ghost1;
-		render_assets(img);
-	}
-	else if (img->game->frame == 6000 && img->game->end == 0)
-	{
-		img->ghost = img->ghost2;
-		render_assets(img);
-	}
-	else if (img->game->frame == 9000 && img->game->end == 0)
-	{
-		img->ghost = img->ghost3;
-		render_assets(img);
-	}
-	else if (img->game->frame == 12000 && img->game->end == 0)
-	{
-		img->ghost = img->ghost2;
-		render_assets(img);
-		img->game->frame = 0;
-	}
-	if (img->game->end == 0)
-		img->game->frame++;
-	return (0);
+	t_game	*game;
+
+	game = img->game;
+	mlx_clear_window(game->mlx, game->mlx_win);
+	if (game->end == 2)
+		mlx_put_image_to_window(game->mlx, game->mlx_win, img->ko,
+			(game->len * SCALE - 600) / 2, (game->lines * SCALE - 400) / 2);
+	else
+		mlx_put_image_to_window(game->mlx, game->mlx_win, img->ok,
+			(game->len * SCALE - 700) / 2, (game->lines * SCALE - 400) / 2);
+	put_banner(game, "PRESS ESC OR Q TO EXIT ...");
 }

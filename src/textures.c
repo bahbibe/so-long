@@ -52,8 +52,6 @@ void	render_map(t_game *game, t_image *img)
 			}
 			else if (game->map[i][j] == 'E')
 				put_img(game, img->door_c, i, j);
-			else if (game->map[i][j] == 'G')
-				put_img(game, img->ghost, i, j);
 		}
 	}
 }
@@ -87,5 +85,6 @@ void	render_assets(t_image *img)
 {
 	render_floor(img->game, img);
 	render_map(img->game, img);
+	render_ghosts(img->game, img);
 	put_banner(img->game, "NUMBER OF MOVES : ");
 }

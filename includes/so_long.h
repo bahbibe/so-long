@@ -17,18 +17,40 @@
 # include "gnl/get_next_line.h"
 # include <mlx.h>
 
-# define K_A 0
-# define A_A 123
-# define K_D 2
-# define A_D 124
-# define K_S 1
-# define A_S 125
-# define K_W 13
-# define A_W 126
-# define K_ESC 53
-# define K_Q 12
+# ifdef __linux__
+#  define K_A 97
+#  define A_A 65361
+#  define K_D 100
+#  define A_D 65363
+#  define K_S 115
+#  define A_S 65364
+#  define K_W 119
+#  define A_W 65362
+#  define K_ESC 65307
+#  define K_Q 113
+# else
+#  define K_A 0
+#  define A_A 123
+#  define K_D 2
+#  define A_D 124
+#  define K_S 1
+#  define A_S 125
+#  define K_W 13
+#  define A_W 126
+#  define K_ESC 53
+#  define K_Q 12
+# endif
 # define SCALE 115
 # define RED 0x00FF0000
+# ifndef GHOST_DELAY
+#  define GHOST_DELAY 30000
+# endif
+
+typedef struct s_ghost
+{
+	int	x;
+	int	y;
+}	t_ghost;
 
 typedef struct s_game
 {
@@ -42,6 +64,11 @@ typedef struct s_game
 	int		pos_x;
 	int		pos_y;
 	int		end;
+	int		steps;
+	int		ghost_count;
+	t_ghost	*ghosts;
+	int		*dist;
+	int		*queue;
 	char	**map;
 	char	**map2;
 	char	*error;
@@ -103,6 +130,12 @@ int		set_error(t_game *game, char *msg);
 void	move(t_game *game, char next, int x, int y);
 void	move_player(t_game *game, t_image *img, int x, int y);
 int		quit(t_game *game);
-int		animate( t_image *img);
+int		animate(t_image *img);
+void	show_end(t_image *img);
+int		init_ghosts(t_game *game);
+void	free_ghosts(t_game *game);
+int		ghost_at(t_game *game, int x, int y);
+int		move_ghosts(t_game *game);
+void	render_ghosts(t_game *game, t_image *img);
 
 #endif
