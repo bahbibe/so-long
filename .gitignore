@@ -6,6 +6,7 @@ so_long
 # MiniLibX (Linux) build output
 minilibx-linux/obj/
 minilibx-linux/Makefile.gen
+minilibx-linux/build.log
 minilibx-linux/test/Makefile.gen
 minilibx-linux/test/mlx-test
 
