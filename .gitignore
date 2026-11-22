@@ -2,3 +2,14 @@
 *.o
 *.a
 so_long
+
+# MiniLibX (Linux) build output
+minilibx-linux/obj/
+minilibx-linux/Makefile.gen
+minilibx-linux/test/Makefile.gen
+minilibx-linux/test/mlx-test
+
+# Local reference files, not part of the repo
+en.subject.pdf
+minilibx-linux.tgz
+tests/test_ghosts
