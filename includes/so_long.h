@@ -98,6 +98,7 @@ void	flood_fill_one(int pos_x, int pos_y, char **map);
 void	flood_fill_two(int pos_x, int pos_y, char **map);
 int		check_collect(t_game *game, char c);
 int		check(t_game *game, char *filename);
+int		check_path(t_game *game);
 int		read_map(t_game *game, char *filename);
 void	exit_error(t_game *game);
 int		set_error(t_game *game, char *msg);

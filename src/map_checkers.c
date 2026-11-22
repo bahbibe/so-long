@@ -15,21 +15,14 @@
 int	is_rect(t_game *game)
 {
 	int	i;
-	int	j;
-	int	k;
 
 	i = 0;
 	while (game->map[i])
 	{
-		if (ft_line_len(game->map[0]) == ft_line_len(game->map[i]))
-			i++;
-		else
+		if (ft_line_len(game->map[0]) != ft_line_len(game->map[i]))
 			return (1);
+		i++;
 	}
-	j = game->lines - 1;
-	k = ft_line_len(game->map[j]);
-	if (game->map[j][k] == '\n')
-		return (1);
 	return (0);
 }
 

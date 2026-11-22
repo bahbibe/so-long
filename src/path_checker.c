@@ -37,3 +37,19 @@ void	flood_fill_two(int pos_x, int pos_y, char **map)
 	flood_fill_two(pos_x - 1, pos_y, map);
 	return ;
 }
+
+int	check_path(t_game *game)
+{
+	game->map2 = dup_map(game);
+	if (!game->map2)
+		return (set_error(game, "Out of memory"));
+	flood_fill_one(game->pos_x, game->pos_y, game->map2);
+	if (check_collect(game, 'C'))
+		return (set_error(game, "Player Can't reach all collectibles"));
+	flood_fill_two(game->pos_x, game->pos_y, game->map2);
+	if (check_collect(game, 'E'))
+		return (set_error(game, "Player Can not exit"));
+	to_free(game->map2);
+	game->map2 = NULL;
+	return (0);
+}

@@ -14,10 +14,10 @@
 
 int	check_extention(char *str)
 {
-	int	pos;
+	size_t	len;
 
-	pos = ft_strlen(str) - 4;
-	if (ft_strncmp(str + pos, ".ber", 4))
+	len = ft_strlen(str);
+	if (len <= 4 || ft_strncmp(str + len - 4, ".ber", 4))
 		return (1);
 	return (0);
 }
@@ -36,21 +36,17 @@ int	check(t_game *game, char *filename)
 		return (set_error(game, "Invalid token"));
 	else if (check_token_count(game))
 		return (set_error(game, "Duplicate or missing token"));
-	game->map2 = dup_map(game);
-	flood_fill_one(game->pos_x, game->pos_y, game->map2);
-	if (check_collect(game, 'C'))
-		return (set_error(game, "Player Can't reach all collectibles"));
-	flood_fill_two(game->pos_x, game->pos_y, game->map2);
-	if (check_collect(game, 'E'))
-		return (set_error(game, "Player Can not exit"));
-	to_free(game->map2);
-	return (0);
+	return (check_path(game));
 }
 
 void	exit_error(t_game *game)
 {
 	ft_putstr_fd("Error:\n", 2);
-	ft_putstr_fd(game->error, 2);
+	if (game->error)
+		ft_putstr_fd(game->error, 2);
+	ft_putstr_fd("\n", 2);
+	to_free(game->map);
+	to_free(game->map2);
 	exit (1);
 }
 
