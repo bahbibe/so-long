@@ -14,87 +14,36 @@
 
 void	init_game(t_game *game)
 {
-	game->frame = 0;
-	game->moves = 0;
-	game->len = 0;
-	game->lines = 0;
-	game->pos = 0;
-	game->colct = 0;
-	game->exit = 0;
-	game->end = 0;
-	game->steps = 0;
-	game->ghost_count = 0;
-	game->ghosts = NULL;
-	game->dist = NULL;
-	game->queue = NULL;
-	game->map = NULL;
-	game->map2 = NULL;
-	game->error = NULL;
-	game->mlx = NULL;
-	game->mlx_win = NULL;
+	ft_bzero(game, sizeof(*game));
+	game->dist_x = -1;
+	game->dist_y = -1;
+	game->dirty = 1;
+	game->dir = 3;
 }
 
-void	init_img(t_game *game, t_image *img)
+static int	gfx_error(t_game *game, char *msg)
 {
-	img->game = game;
-	img->wall = mlx_xpm_file_to_image(game->mlx, "./img/wall.xpm",
-			&img->img_width, &img->img_height);
-	img->coll = mlx_xpm_file_to_image(game->mlx, "./img/coll.xpm",
-			&img->img_width, &img->img_height);
-	img->floor = mlx_xpm_file_to_image(game->mlx, "./img/floor.xpm",
-			&img->img_width, &img->img_height);
-	img->door_o = mlx_xpm_file_to_image(game->mlx, "./img/door_o.xpm",
-			&img->img_width, &img->img_height);
-	img->door_c = mlx_xpm_file_to_image(game->mlx, "./img/door_c.xpm",
-			&img->img_width, &img->img_height);
-	img->ghost1 = mlx_xpm_file_to_image(game->mlx, "./img/ghost1.xpm",
-			&img->img_width, &img->img_height);
-	img->ghost2 = mlx_xpm_file_to_image(game->mlx, "./img/ghost2.xpm",
-			&img->img_width, &img->img_height);
-	img->ghost3 = mlx_xpm_file_to_image(game->mlx, "./img/ghost3.xpm",
-			&img->img_width, &img->img_height);
-	img->stair = mlx_xpm_file_to_image(game->mlx, "./img/stair.xpm",
-			&img->img_width, &img->img_height);
-	img->ok = mlx_xpm_file_to_image(game->mlx, "./img/ok.xpm",
-			&img->img_width, &img->img_height);
-	img->ko = mlx_xpm_file_to_image(game->mlx, "./img/ko.xpm",
-			&img->img_width, &img->img_height);
-	img->ghost = img->ghost1;
-	img->play = img->play_r;
+	destroy_gfx(game);
+	return (set_error(game, msg));
 }
 
-void	init_player_img(t_game *game, t_image *img)
+int	init_window(t_game *game)
 {
-	img->play_r = mlx_xpm_file_to_image(game->mlx, "./img/play_r.xpm",
-			&img->img_width, &img->img_height);
-	img->play_l = mlx_xpm_file_to_image(game->mlx, "./img/play_l.xpm",
-			&img->img_width, &img->img_height);
-	img->play_u = mlx_xpm_file_to_image(game->mlx, "./img/play_u.xpm",
-			&img->img_width, &img->img_height);
-	img->play_d = mlx_xpm_file_to_image(game->mlx, "./img/play_d.xpm",
-			&img->img_width, &img->img_height);
-}
+	int	w;
+	int	h;
 
-int	check_img(t_image *img)
-{
-	return (!img->wall || !img->coll || !img->floor || !img->door_o
-		|| !img->door_c || !img->ghost1 || !img->ghost2 || !img->ghost3
-		|| !img->stair || !img->ok || !img->ko || !img->play_r
-		|| !img->play_l || !img->play_u || !img->play_d);
-}
-
-int	init_window(t_game *game, t_image *img)
-{
+	w = game->len * TILE;
+	h = game->lines * TILE + HUD_H;
 	game->mlx = mlx_init();
 	if (!game->mlx)
 		return (set_error(game, "Can not initialize MiniLibX"));
-	init_player_img(game, img);
-	init_img(game, img);
-	if (check_img(img))
-		return (set_error(game, "Can not load textures, run from repo root"));
-	game->mlx_win = mlx_new_window(game->mlx, game->len * SCALE,
-			(game->lines + 1) * SCALE, "so_long");
+	game->mlx_win = mlx_new_window(game->mlx, w, h, "so_long");
 	if (!game->mlx_win)
-		return (set_error(game, "Can not create window"));
+		return (gfx_error(game, "Can not create window"));
+	if (init_frame(game, &game->fb, w, h) || init_frame(game, &game->bg, w, h))
+		return (gfx_error(game, "Can not create frame buffer"));
+	build_bg(game);
+	game->from = tile_origin(game->pos_x, game->pos_y);
+	game->ghost_t0 = now_ms();
 	return (0);
 }

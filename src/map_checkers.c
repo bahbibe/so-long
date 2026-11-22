@@ -76,18 +76,22 @@ int	check_token_count(t_game *game)
 {
 	int	i;
 	int	j;
+	int	exits;
+	int	pos;
 
 	i = 0;
+	exits = 0;
+	pos = 0;
 	while (game->map[i])
 	{	
 		j = -1;
 		while (game->map[i][++j])
 		{
 			if (game->map[i][j] == 'E')
-				game->exit++;
+				exits++;
 			if (game->map[i][j] == 'P')
 			{
-				game->pos++;
+				pos++;
 				game->pos_x = i;
 				game->pos_y = j;
 			}
@@ -96,23 +100,23 @@ int	check_token_count(t_game *game)
 		}
 		i++;
 	}
-	if (game->exit != 1 || game->pos != 1 || game->colct == 0)
+	if (exits != 1 || pos != 1 || game->colct == 0)
 		return (1);
 	return (0);
 }
 
-int	check_collect(t_game *game, char c)
+int	check_collect(char **map, char c)
 {
 	int	i;
 	int	j;
 
 	i = 0;
-	while (game->map2[i])
+	while (map[i])
 	{
 		j = 0;
-		while (game->map2[i][j])
+		while (map[i][j])
 		{
-			if (game->map2[i][j] == c)
+			if (map[i][j] == c)
 				return (1);
 			j++;
 		}

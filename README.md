@@ -20,7 +20,7 @@ make
 
 ## Run
 
-Run the game from the repository root. Textures are loaded from `./img`, so another working directory fails with `Can not load textures, run from repo root`.
+The game has no asset files: every sprite is drawn in code, so it runs from any directory.
 
 ```sh
 ./so_long maps/map1.ber
@@ -41,9 +41,9 @@ Run the game from the repository root. Textures are loaded from `./img`, so anot
 
 - Collect every collectible (`C`). The door at the exit (`E`) opens once all of them are taken. Walking into it before that does nothing.
 - Reach the opened exit to win.
-- Ghosts (`G`) hunt you. They take one step toward you at a fixed pace, along the shortest path around walls. Touching a ghost ends the game with a loss, whether you walk into it or it reaches you. Ghosts pass over collectibles and the exit, and two ghosts never share a tile. A ghost that is walled off from you stays where it is.
+- Ghosts (`G`) hunt you. They take one step toward you every `GHOST_DELAY` ms (see Ghost speed), along the shortest path around walls. Touching a ghost ends the game with a loss, whether you walk into it or it reaches you. Ghosts pass over collectibles and the exit, and two ghosts never share a tile. A ghost that is walled off from you stays where it is.
 - Walls (`1`) block movement.
-- The top row of the window shows `NUMBER OF MOVES : <n>`. Only moves that actually change the player's position are counted. Bumping into a wall or a closed door is not a move.
+- The bar at the top of the window shows the number of collectibles left (coin icon) and the number of moves (arrow icon). Only moves that actually change the player's position are counted. Bumping into a wall or a closed door is not a move.
 - After a win or a loss the game stops accepting moves. Press `ESC` or `Q` to exit.
 
 ## Map format
@@ -94,16 +94,16 @@ On an invalid map or a start-up failure the program prints `Error:` and a messag
 | `Player Can't reach all collectibles` | A `C` is cut off from `P` |
 | `Player Can not exit` | `E` is cut off from `P` |
 | `Can not initialize MiniLibX` | `mlx_init` failed |
-| `Can not load textures, run from repo root` | An `.xpm` file in `./img` could not be loaded |
+| `Can not create frame buffer` | `mlx_new_image` failed or the display is not 32 bits per pixel |
 | `Can not create window` | `mlx_new_window` failed |
 | `Out of memory` | An allocation failed |
 
 ## Ghost speed
 
-Ghosts step every `GHOST_DELAY` iterations of the MiniLibX loop (`includes/so_long.h`, default 30000). The project may only use the allowed functions, so there is no clock and the pace depends on how fast the loop runs. 30000 is about half a second per step on Linux. Change it for your machine at build time:
+Ghosts step every `GHOST_DELAY` milliseconds (`includes/so_long.h`, default 450) and glide to the next tile. The loop reads the clock with `gettimeofday` and sleeps with `usleep` between frames, so these two functions are used on top of the usual MiniLibX ones. Change the delay at build time:
 
 ```sh
-make re FLAGS="-Wall -Wextra -Werror -DGHOST_DELAY=60000"
+make re FLAGS="-Wall -Wextra -Werror -O2 -DGHOST_DELAY=300"
 ```
 
 ## Tests
@@ -117,7 +117,7 @@ tests/run_tests.sh
 
 Set `BIN=/path/to/so_long` to test another binary.
 
-`make unit` builds and runs `tests/test_ghosts.c`, which tests the ghost logic without a window: setup, shortest path chase, no stacking, walled off ghosts and the no-ghost case.
+`make unit` builds and runs two programs, neither needs a window. `tests/test_ghosts.c` tests the ghost logic: setup, shortest path chase, no stacking, walled off ghosts and the no-ghost case. `tests/test_render.c` draws into plain buffers and checks the primitives, the sprites and the digit font: clipping at every edge, NULL and bad buffers, and that nothing is written outside the frame. Run `DUMP=scene.ppm tests/test_render` to save a sample scene as a PPM image.
 
 ## Project layout
 
@@ -127,15 +127,21 @@ src/error_checkers.c file name check, check(), error reporting
 src/map_checkers.c   shape, walls, tokens, token counts
 src/path_checker.c   flood fill and reachability check
 src/helpers.c        map reading and copying, cleanup
-src/init.c           game state, texture loading, window setup
-src/textures.c       rendering and the move counter
-src/animations.c     movement, key handling, end screen
+src/init.c           game state and window setup
+src/frame.c          off-screen frame buffers, graphics cleanup
+src/draw_shapes.c    pixel, rectangle, circle, dimming primitives
+src/draw_tiles.c     floor, wall, coin and door sprites
+src/draw_actors.c    player and ghost sprites
+src/draw_hud.c       digit font and the top bar
+src/render.c         frame composition and presentation
+src/scene.c          items, ghosts and the end panel
+src/clock.c          millisecond clock and interpolation
+src/animations.c     movement and key handling
 src/ghosts.c         ghost setup, cleanup and lookup
 src/ghost_move.c     breadth first search and ghost steps
-src/ghost_anim.c     ghost drawing and the per-loop timer
+src/ghost_anim.c     main loop tick (ghost timer, redraw when needed)
 includes/libft       libft
 includes/gnl         get_next_line
-img/                 XPM textures
 minilibx-linux/      MiniLibX for Linux (built by make on Linux)
 maps/                sample map
 tests/               test script, test maps and ghost unit tests

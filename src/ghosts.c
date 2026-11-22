@@ -46,7 +46,9 @@ static void	fill_ghosts(t_game *game)
 			if (game->map[i][j] != 'G')
 				continue ;
 			game->ghosts[n].x = i;
-			game->ghosts[n++].y = j;
+			game->ghosts[n].y = j;
+			game->ghosts[n].fx = i;
+			game->ghosts[n++].fy = j;
 			game->map[i][j] = '0';
 		}
 	}

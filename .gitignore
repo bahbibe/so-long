@@ -13,3 +13,4 @@ minilibx-linux/test/mlx-test
 en.subject.pdf
 minilibx-linux.tgz
 tests/test_ghosts
+tests/test_render

@@ -15,7 +15,6 @@
 int	main(int ac, char **av)
 {
 	t_game	game;
-	t_image	img;
 
 	if (ac != 2)
 	{
@@ -23,12 +22,11 @@ int	main(int ac, char **av)
 		exit(1);
 	}
 	init_game(&game);
-	if (check(&game, av[1]) || init_ghosts(&game)
-		|| init_window(&game, &img))
+	if (check(&game, av[1]) || init_ghosts(&game) || init_window(&game))
 		exit_error(&game);
-	render_assets(&img);
-	mlx_key_hook(game.mlx_win, move_keys, &img);
-	mlx_loop_hook(game.mlx, animate, &img);
+	mlx_hook(game.mlx_win, 2, 1L << 0, key_press, &game);
+	mlx_expose_hook(game.mlx_win, expose, &game);
+	mlx_loop_hook(game.mlx, tick, &game);
 	mlx_hook(game.mlx_win, 17, 0, quit, &game);
 	mlx_loop(game.mlx);
 	return (0);
