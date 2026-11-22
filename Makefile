@@ -22,7 +22,7 @@ White	=\033[0;37m
 
 CC		=	cc
 NAME	=	so_long
-FLAGS	=	-Wall -Wextra -Werror# -fsanitize=address -g
+FLAGS	=	-Wall -Wextra -Werror
 
 SRCS	=	src/error_checkers.c \
 			src/animations.c \
@@ -35,14 +35,14 @@ SRCS	=	src/error_checkers.c \
 
 LIBS		=	libft gnl
 
-INCLUDES	=	$(LIBS:%=includes/$*/%.a)
+INCLUDES	=	$(LIBS:%=includes/%.a)
 
-MLX_macos	=	-lmlx -framework OpenGL -framework AppKit
+MLX		=	-lmlx -framework OpenGL -framework AppKit
 
 all: $(LIBS) $(NAME)
 	@:
-$(NAME): $(SRCS)
-	@$(CC) -I includes $(FLAGS) $(SRCS) $(INCLUDES) $(MLX_macos) -o $(NAME)
+$(NAME): $(SRCS) includes/so_long.h
+	@$(CC) -I includes $(FLAGS) $(SRCS) $(INCLUDES) $(MLX) -o $(NAME)
 	@printf '\r$ $(Purple) Created so_long ✅ $(Off)\n'
 	
 libs: $(LIBS)
@@ -59,4 +59,4 @@ fclean: clean
 	@rm -rf $(NAME)
 	@rm -rf $(INCLUDES)
 re: fclean all
-.PHONY: all
+.PHONY: all libs $(LIBS) clean fclean re
