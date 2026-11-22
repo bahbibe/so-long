@@ -19,16 +19,12 @@ int	main(int ac, char **av)
 
 	if (ac != 2)
 	{
-		ft_putstr_fd("Error:\nUsage: ./solong <map_file.ber>\n", 2);
+		ft_putstr_fd("Error:\nUsage: ./so_long <map_file.ber>\n", 2);
 		exit(1);
 	}
-	game.mlx = mlx_init();
-	init_game(&game, &img);
-	init_img(&game, &img);
-	if (check(&game, av[1]))
+	init_game(&game);
+	if (check(&game, av[1]) || init_window(&game, &img))
 		exit_error(&game);
-	game.mlx_win = mlx_new_window(game.mlx, game.len * SCALE,
-			(game.lines + 1) * SCALE, "so_long");
 	render_assets(&img);
 	mlx_key_hook(game.mlx_win, move_keys, &img);
 	mlx_loop_hook(game.mlx, animate, &img);

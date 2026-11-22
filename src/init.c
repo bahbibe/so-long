@@ -12,7 +12,7 @@
 
 #include "so_long.h"
 
-void	init_game(t_game *game, t_image *img)
+void	init_game(t_game *game)
 {
 	game->frame = 0;
 	game->moves = 0;
@@ -22,7 +22,11 @@ void	init_game(t_game *game, t_image *img)
 	game->colct = 0;
 	game->exit = 0;
 	game->end = 0;
-	init_player_img(game, img);
+	game->map = NULL;
+	game->map2 = NULL;
+	game->error = NULL;
+	game->mlx = NULL;
+	game->mlx_win = NULL;
 }
 
 void	init_img(t_game *game, t_image *img)
@@ -64,4 +68,28 @@ void	init_player_img(t_game *game, t_image *img)
 			&img->img_width, &img->img_height);
 	img->play_d = mlx_xpm_file_to_image(game->mlx, "./img/play_d.xpm",
 			&img->img_width, &img->img_height);
+}
+
+int	check_img(t_image *img)
+{
+	return (!img->wall || !img->coll || !img->floor || !img->door_o
+		|| !img->door_c || !img->ghost1 || !img->ghost2 || !img->ghost3
+		|| !img->stair || !img->ok || !img->ko || !img->play_r
+		|| !img->play_l || !img->play_u || !img->play_d);
+}
+
+int	init_window(t_game *game, t_image *img)
+{
+	game->mlx = mlx_init();
+	if (!game->mlx)
+		return (set_error(game, "Can not initialize MiniLibX"));
+	init_player_img(game, img);
+	init_img(game, img);
+	if (check_img(img))
+		return (set_error(game, "Can not load textures, run from repo root"));
+	game->mlx_win = mlx_new_window(game->mlx, game->len * SCALE,
+			(game->lines + 1) * SCALE, "so_long");
+	if (!game->mlx_win)
+		return (set_error(game, "Can not create window"));
+	return (0);
 }

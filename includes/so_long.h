@@ -44,13 +44,8 @@ typedef struct s_game
 	char	**map;
 	char	**map2;
 	char	*error;
-	char	*score;
-	char	*score_i;
-	char	*msg;
 	void	*mlx;
 	void	*mlx_win;
-	int		win_width;
-	int		win_height;
 }	t_game;
 
 typedef struct s_image
@@ -86,7 +81,9 @@ void	render_assets(t_image *img);
 void	render_floor(t_game *game, t_image *img);
 void	render_map(t_game *game, t_image *img);
 void	to_free(char **map);
-void	init_game(t_game *game, t_image *img);
+void	init_game(t_game *game);
+int		init_window(t_game *game, t_image *img);
+int		check_img(t_image *img);
 char	**dup_map(t_game *game);
 int		ft_line_len(char *line);
 int		check_extention(char *str);
