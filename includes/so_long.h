@@ -28,6 +28,7 @@
 # define K_ESC 53
 # define K_Q 12
 # define SCALE 115
+# define RED 0x00FF0000
 
 typedef struct s_game
 {

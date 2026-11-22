@@ -63,12 +63,16 @@ int	put_banner(t_game *game, char *msg)
 	char	*moves;
 	char	*str;
 
+	if (game->end)
+		return (mlx_string_put(game->mlx, game->mlx_win, 2, 0, RED, msg));
 	moves = ft_itoa(game->moves);
+	if (!moves)
+		return (1);
 	str = ft_strjoin(msg, moves);
-	if (game->end == 0)
-		mlx_string_put(game->mlx, game->mlx_win, 2, 0, 0x00FF0000, str);
-	mlx_string_put(game->mlx, game->mlx_win, 2, 0, 0x00FF0000, msg);
 	free(moves);
+	if (!str)
+		return (1);
+	mlx_string_put(game->mlx, game->mlx_win, 2, 0, RED, str);
 	free(str);
 	return (0);
 }
@@ -77,11 +81,11 @@ void	put_img(t_game *game, void *img, int i, int j)
 {
 	mlx_put_image_to_window(game->mlx, game->mlx_win, img,
 		j * SCALE, (i + 1) * SCALE);
-	put_banner(game, "NUMBER OF MOVES : ");
 }
 
 void	render_assets(t_image *img)
 {
 	render_floor(img->game, img);
 	render_map(img->game, img);
+	put_banner(img->game, "NUMBER OF MOVES : ");
 }

@@ -15,7 +15,7 @@
 void	move(t_game *game, char next, int x, int y)
 {
 	if (next == 'G' || (next == 'E' && game->colct == 0))
-			game->end = 1;
+		game->end = 1;
 	else if (next == 'C')
 	{
 		game->map[game->pos_x][game->pos_y] = '0';
@@ -31,42 +31,34 @@ void	move(t_game *game, char next, int x, int y)
 		game->pos_y += y;
 		game->pos_x += x;
 	}
-	else if (next == '1')
-		return ;
 }
 
 void	move_player(t_game *game, t_image *img, int x, int y)
 {
 	char	next;
 
-	game->moves++;
 	next = game->map[game->pos_x + x][game->pos_y + y];
-	if (next == '1' || (next == 'E' && game->colct != 0))
+	if (game->end || next == '1' || (next == 'E' && game->colct != 0))
 		return ;
+	game->moves++;
 	mlx_clear_window(game->mlx, game->mlx_win);
 	move(game, next, x, y);
 	if (game->end == 0)
 		render_assets(img);
 	else if (next == 'G')
-	{
 		mlx_put_image_to_window(game->mlx, game->mlx_win, img->ko,
 			(game->len * SCALE - 600) / 2, (game->lines * SCALE - 400) / 2);
-		game->end = 1;
-		put_banner(game, "PRESS ESC OR Q TO EXIT ...");
-	}
 	else
-	{
 		mlx_put_image_to_window(game->mlx, game->mlx_win, img->ok,
 			(game->len * SCALE - 700) / 2, (game->lines * SCALE - 400) / 2);
-		game->end = 1;
+	if (game->end)
 		put_banner(game, "PRESS ESC OR Q TO EXIT ...");
-	}
 }
 
 int	move_keys(int key, t_image *img)
 {
 	if (key == K_ESC || key == K_Q)
-		exit(0);
+		quit(img->game);
 	else if (key == K_W || key == A_W)
 	{
 		img->play = img->play_u;
@@ -74,12 +66,12 @@ int	move_keys(int key, t_image *img)
 	}
 	else if (key == K_S || key == A_S)
 	{
-	img->play = img->play_d;
+		img->play = img->play_d;
 		move_player(img->game, img, 1, 0);
 	}
 	else if (key == K_A || key == A_A)
 	{
-			img->play = img->play_l;
+		img->play = img->play_l;
 		move_player(img->game, img, 0, -1);
 	}
 	else if (key == K_D || key == A_D)
@@ -93,11 +85,12 @@ int	move_keys(int key, t_image *img)
 int	quit(t_game *game)
 {
 	mlx_destroy_window(game->mlx, game->mlx_win);
+	to_free(game->map);
 	exit(0);
 }
 
 int	animate(t_image *img)
-{	
+{
 	if (img->game->frame == 3000 && img->game->end == 0)
 	{
 		img->ghost = img->ghost1;
@@ -117,8 +110,9 @@ int	animate(t_image *img)
 	{
 		img->ghost = img->ghost2;
 		render_assets(img);
-		img->game->frame = 0 ;
+		img->game->frame = 0;
 	}
-	img->game->frame++;
+	if (img->game->end == 0)
+		img->game->frame++;
 	return (0);
 }
