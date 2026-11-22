@@ -14,12 +14,10 @@
 
 static int	ft_word(char *str, char c)
 {
-	int	len;
 	int	word;
 	int	i;
 	int	count;
 
-	len = 0;
 	word = 1;
 	count = 0;
 	i = 0;
@@ -43,10 +41,8 @@ static char	*ft_worddup(char *str, char c, int *index)
 	char	*ptr;
 	int		count;
 	int		pos;
-	int		i;
 
 	count = 0;
-	i = 0;
 	while (str[*index] == c && str[*index])
 		(*index)++;
 	pos = *index;
