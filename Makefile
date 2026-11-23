@@ -54,8 +54,11 @@ MLX_DIR		=	minilibx-linux
 MLX_LIB		=	$(MLX_DIR)/libmlx.a
 MLX_INC		=	-I $(MLX_DIR)
 MLX			=	-L$(MLX_DIR) -lmlx -lXext -lX11 -lm
+# MiniLibX's own make also builds a demo (test/mlx-test) that needs libbsd.
+# Only libmlx.a matters here, so a failing demo is ignored.
 $(MLX_LIB):
-	@make -C $(MLX_DIR) > /dev/null
+	@make -C $(MLX_DIR) > $(MLX_DIR)/build.log 2>&1 || true
+	@test -f $(MLX_LIB) || { cat $(MLX_DIR)/build.log; exit 1; }
 	@printf '\r$ $(Purple) Built MiniLibX ✅ $(Off)\n'
 else
 MLX			=	-lmlx -framework OpenGL -framework AppKit
